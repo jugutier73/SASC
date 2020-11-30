@@ -8,7 +8,7 @@
  *
  * Autor: Julián Esteban Gutiérrez Posada
  * Fecha: Noviembre de 2020
- * Versión: 1.0
+ * Versión: 1.1
  * Licencia: GNU GPL v3 (https://www.gnu.org/licenses/gpl-3.0.html)
  */
 
@@ -189,16 +189,24 @@ func determinarDistanciasEntreArchivos(tablaCodigoFuente []CodigoFuente) []Codig
  */
 func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float64, directioActual string) {
 	var nombre string
+
 	for _, archivo := range tablaCodigoFuente {
 		nombre = strings.Replace(archivo.nombre, directioActual, ".", 1)
-		fmt.Println(nombre)
+		bandera := false
+
 		for _, distanciaArchivo := range archivo.tablaDistancias {
 			if distanciaArchivo.distancia <= distanciaMinima {
+				if bandera == false {
+					bandera = true
+					fmt.Println(nombre)
+				}
 				nombre = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
 				fmt.Printf("\t%8.2f %s\n", distanciaArchivo.distancia, nombre)
 			}
 		}
-		fmt.Println()
+		if bandera == true {
+			fmt.Println()			
+		}
 	}
 }
 
@@ -209,7 +217,7 @@ func main() {
 	fmt.Println("SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)")
 	fmt.Println("Julián Esteban Gutiérrez Posada")
 	fmt.Println("jugutier@uniquindio.edu.co\n")
-	fmt.Println("Versión 1.0 - Licencia GNU - GPL v3")
+	fmt.Println("Versión 1.1 - Licencia GNU - GPL v3")
 	fmt.Println("Noviembre de 2020\n")
 
 	fmt.Println("Para más información user ./SASC --help\n")
