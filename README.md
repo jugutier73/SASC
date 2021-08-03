@@ -18,6 +18,8 @@ Por otro lado, si se analiza código fuente y se detectan dos archivos con la mi
 
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 --------------------------------------------------
+
+```
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
@@ -29,7 +31,14 @@ Permite determinar la distancia que hay entre múltiples archivos distribuidos e
 
 Fase 1 de 3: Calculando características de cada archivo...
 Fase 2 de 3: Calculando distancia entre los archivos...
-Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
+```
+
+`Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...`
+
+o puede generar un reporte en CSV
+
+`Fase 3 de 3: Generando el archivo "Reporte.csv"`
+
 
 
 Utilización
