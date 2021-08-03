@@ -18,17 +18,18 @@ Por otro lado, si se analiza código fuente y se detectan dos archivos con la mi
 
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 --------------------------------------------------
+SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
 
-Versión 1.0 - Licencia GNU - GPL v3
-Noviembre de 2020
+Versión 1.5 - Licencia GNU - GPL v3
+Agosto de 2021
 
 Permite determinar la distancia que hay entre múltiples archivos distribuidos en subdirectorios.
 
-- Fase 1 de 3: Calculando características de cada archivo...
-- Fase 2 de 3: Calculando distancia entre los archivos...
-- Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
+Fase 1 de 3: Calculando características de cada archivo...
+Fase 2 de 3: Calculando distancia entre los archivos...
+Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
 
 
 Utilización
@@ -55,6 +56,11 @@ Utilización
        imprimir solamente las distancia menores o iguales 30, recuerde que 0 es que ambos archivos usaron la misma cantidad todos los caracteres de la tabla ASCII
 
        ./SASC c 30
+       
+    c. Analiza en todos los subdirectorios del directorio actual por programas de extensión (.go) y 
+       crea un archivo llamada reporte.csv con una tabla con las distancias en formato CSV.
+
+       ./SASC go repore.csv
 
 
 Si lo desea, puede redireccionar la salida de SASC a un archivo de texto a nivel de informe, por ejemplo:
@@ -63,30 +69,28 @@ Si lo desea, puede redireccionar la salida de SASC a un archivo de texto a nivel
 
 SASC está compilado en versión para macOS, Windows 64 y Linux de 64 bits
 
-Espero les sea de utilidad.
 
 EJEMPLO
 -------
 
-Suponga que tres grupo entregaron los archivos: sumaFlujos.go, sumaTubos.go, sumarF.go, respectivamente. Estos archivos se guardan en las en los subdirectorios: *"Grupo 01"*, *"Grupo 02"* y *"Grupo 03"* dentro del directorio *"/Trabajo"*. 
+1) Suponga que tres grupo entregaron los archivos: sumaFlujos.go, sumaTubos.go, sumarF.go, respectivamente. Estos archivos se guardan en las en los subdirectorios: *"Grupo 01"*, *"Grupo 02"* y *"Grupo 03"* dentro del directorio *"/Trabajo"*. 
 
 Ubicado en el directorio "/Trabajo" se ejecuta el comando:
 
-    ./SASC go 100
+./SASC go 100
 
 Obteniendo la siguiente salida:
 
-```
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
 
-Versión 1.0 - Licencia GNU - GPL v3
-Noviembre de 2020
+Versión 1.5 - Licencia GNU - GPL v3
+Agosto de 2021
 
 Para más información user ./SASC --help
 
-Procesando 139 archivo de extensión .go en /Trabajo
+Procesando 3 archivo de extensión .go en /Trabajo
 
 Fase 1 de 3: Calculando características de cada archivo...
 Fase 2 de 3: Calculando distancia entre los archivos...
@@ -94,16 +98,41 @@ Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
 
 ./Grupo 01/sumaFlujos.go
 	   75.28 ./Grupo 02/sumaTubos.go
-	    1.23 ./Grupo 03/sumarF.go
+	   99.94 ./Grupo 03/sumarF.go
 
 ./Grupo 02/sumaTubos.go
-	   41.68 ./Grupo 01/sumaFlujos.go
-	   99.94 ./Grupo 03/sumarF.go
+	   75.28 ./Grupo 01/sumaFlujos.go
+	   83.42 ./Grupo 03/sumarF.go
 
 ./Grupo 03/sumarF.go
-	    1.23 ./Grupo 01/sumaFlujos.go
-	   99.94 ./Grupo 03/sumarF.go
+	   83.42 ./Grupo 02/sumaTubos.go
+	   99.94 ./Grupo 01/sumaFlujos.go
+
+...
 
 En este ejemplo hipotético, sería interesante dar una mirada con detenimiento a los archivos
 ./Grupo 01/sumaFlujos.go y ./Grupo 03/sumarF.go
-```
+
+
+2) Ubicado en el directorio "/Trabajo" se ejecuta el comando:
+
+./SASC go Reporte.csv
+
+Procesando 3 archivo de extensión .go en /Trabajo
+
+Fase 1 de 3: Calculando características de cada archivo...
+Fase 2 de 3: Calculando distancia entre los archivos...
+Fase 3 de 3: Generando el archivo "Reporte.csv"
+
+-> Reporte.csv <-
+
+CÓDIGO FUENTE       	./Grupo 01/sumaFlujos.go    ./Grupo 02/sumaTubos.go    ./Grupo 03/sumarF.go
+./Grupo 01/sumaFlujos.go      	 0.00          	        75.28             	99.94
+./Grupo 02/sumaTubos.go       	75.28           	 0.00             	83.42
+./Grupo 03/sumarF.go          	99.94                 	83.42              	 0.00      
+
+
+
+Espero les sea de utilidad.
+
+
