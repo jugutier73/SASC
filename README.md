@@ -118,20 +118,30 @@ En este ejemplo hipotético, sería interesante dar una mirada con detenimiento 
 
 ```./SASC go Reporte.csv
 
+SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
+Julián Esteban Gutiérrez Posada
+jugutier@uniquindio.edu.co
+
+Versión 1.5 - Licencia GNU - GPL v3
+Agosto de 2021
+
+Para más información user ./SASC --help
+
 Procesando 3 archivo de extensión .go en /Trabajo
 
 Fase 1 de 3: Calculando características de cada archivo...
 Fase 2 de 3: Calculando distancia entre los archivos...
 Fase 3 de 3: Generando el archivo "Reporte.csv"
+```
 
 -> Reporte.csv <-
 
+```
 CÓDIGO FUENTE       	./Grupo 01/sumaFlujos.go    ./Grupo 02/sumaTubos.go    ./Grupo 03/sumarF.go
 ./Grupo 01/sumaFlujos.go      	 0.00          	        75.28             	99.94
 ./Grupo 02/sumaTubos.go       	75.28           	 0.00             	83.42
 ./Grupo 03/sumarF.go          	99.94                 	83.42              	 0.00      
 ```
-
 
 Espero les sea de utilidad.
 
