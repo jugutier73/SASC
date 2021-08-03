@@ -6,9 +6,12 @@
  * Luego imprime un informe de la distancia de cada archivo a todos los demás.
  * El usuario puede restringir la impresión solamente a los que se encuentren a un distancia mímina.
  *
+ * Ahora en la verisón 1.5 ya se puede generar un archivo para una hoja electróca,
+ * una matriz para comparar todos los trabajos con una distancia máxima definida.
+ *
  * Autor: Julián Esteban Gutiérrez Posada
- * Fecha: Noviembre de 2020
- * Versión: 1.1
+ * Fecha: Agosto de 2021
+ * Versión: 1.5
  * Licencia: GNU GPL v3 (https://www.gnu.org/licenses/gpl-3.0.html)
  */
 
@@ -51,13 +54,12 @@ type CodigoFuente struct {
  * Función para obtener los valor por defecto de los parámetros de la aplicación.
  * Por defecto se asume la extensión "go" y sin un valor mínimo de distancia para filtrar la impresión.
  * El usuario puede indicar otra extensión y si lo desea puede definir un valor mínimo
- * return: extensión por defecto y el valor mínimo de la distancia
+ * return: extensión por defecto, el valor mínimo de la distancia y el nombre del archivo csv
  */
-func obtenerValorPorDefecto() (string, float64) {
-	var err error
-
+func obtenerValorPorDefecto() (string, float64, string) {
 	extensionPorDefecto := "go"
 	distanciaMinima := math.MaxFloat64 // Sin distancia mínima
+	nombreTablaCSV := ""
 
 	if len(os.Args) >= 2 && len(os.Args) <= 3 {
 		extensionPorDefecto = os.Args[1]
@@ -65,21 +67,23 @@ func obtenerValorPorDefecto() (string, float64) {
 		if extensionPorDefecto == "--help" {
 			fmt.Println("AYUDA:\n")
 			fmt.Println("El programa se puede ejecutar con hasta con dos parámetros opcionales\n")
-			fmt.Println("\t ./SASC [extensión] [distancia mínima]\n")
-			fmt.Println("Por defecto se asume \"go\" y sin distancia mínima.\n")
+			fmt.Println("\t ./SASC [extensión] [distancia mínima | nombreTabla.csv]\n")
+			fmt.Println("Por defecto se asume \"go\", sin distancia mínima y sin archivo CSV.\n")
 			os.Exit(0)
 		}
 
 		if len(os.Args) == 3 {
-			distanciaMinima, err = strconv.ParseFloat(os.Args[2], 64)
+			distancia, err := strconv.ParseFloat(os.Args[2], 64)
 
 			if err != nil {
-				panic("Recuerde que el segundo parámetro debe ser le valor de la mímina distancia")
+				nombreTablaCSV = os.Args[2]				
+			} else {
+				distanciaMinima = distancia
 			}
 		}
 	}
 
-	return extensionPorDefecto, distanciaMinima
+	return extensionPorDefecto, distanciaMinima, nombreTablaCSV
 }
 
 /*
@@ -114,9 +118,9 @@ func prodesarArchivo(nombre string) []int {
 
 	filebuffer, err := ioutil.ReadFile(nombre)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		panic ( err )
 	}
+
 	inputdata := string(filebuffer)
 	data := bufio.NewScanner(strings.NewReader(inputdata))
 	data.Split(bufio.ScanRunes)
@@ -167,16 +171,9 @@ func determinarDistanciasEntreArchivos(tablaCodigoFuente []CodigoFuente) []Codig
 
 	for i, archivo1 := range tablaCodigoFuente {
 		for _, archivo2 := range tablaCodigoFuente {
-			if archivo1.nombre != archivo2.nombre {
-				distanciaTemp := calcularDistancia(archivo1, archivo2)
-				tablaCodigoFuente[i].tablaDistancias = append(tablaCodigoFuente[i].tablaDistancias, DistanciaCodigo{nombre: archivo2.nombre, distancia: distanciaTemp})
-			}
+			distanciaTemp := calcularDistancia(archivo1, archivo2)
+			tablaCodigoFuente[i].tablaDistancias = append(tablaCodigoFuente[i].tablaDistancias, DistanciaCodigo{nombre: archivo2.nombre, distancia: distanciaTemp})
 		}
-
-		// Ordena las distancias de forma ascendente
-		sort.Slice(tablaCodigoFuente[i].tablaDistancias, func(j, k int) bool {
-			return tablaCodigoFuente[i].tablaDistancias[j].distancia < tablaCodigoFuente[i].tablaDistancias[k].distancia
-		})
 	}
 
 	return tablaCodigoFuente
@@ -188,9 +185,14 @@ func determinarDistanciasEntreArchivos(tablaCodigoFuente []CodigoFuente) []Codig
  * param: arreglo con la información del código fuente de los archivo y la distancia mínina
  */
 func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float64, directioActual string) {
-	var nombre string
+	var nombre, nombre2 string
 
 	for _, archivo := range tablaCodigoFuente {
+		// Ordena las distancias de forma ascendente
+		sort.Slice(archivo.tablaDistancias, func(j, k int) bool {
+			return archivo.tablaDistancias[j].distancia < archivo.tablaDistancias[k].distancia
+		})
+
 		nombre = strings.Replace(archivo.nombre, directioActual, ".", 1)
 		bandera := false
 
@@ -200,13 +202,48 @@ func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float6
 					bandera = true
 					fmt.Println(nombre)
 				}
-				nombre = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
-				fmt.Printf("\t%8.2f %s\n", distanciaArchivo.distancia, nombre)
+				nombre2 = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
+				if nombre != nombre2 {
+					fmt.Printf("\t%8.2f %s\n", distanciaArchivo.distancia, nombre2)
+				}
 			}
 		}
 		if bandera == true {
 			fmt.Println()			
 		}
+	}
+}
+
+/*
+ * Función para imprimir las distancias de cada archivo a todos los demás
+ * usando el filtro de la distancia mínima
+ * param: arreglo con la información del código fuente de los archivo y la distancia mínina
+ */
+ func generarArchivoCSV(tablaCodigoFuente []CodigoFuente, directioActual string, nombreTablaCSV string) {
+	var nombre string
+
+	ptrArchivo, err := os.Create( nombreTablaCSV )
+
+	if err != nil {
+		panic( err )
+	}
+
+	fmt.Fprintf ( ptrArchivo, "CÓDIGO FUENTE\t%s", nombre )
+	for _, distanciaArchivo := range tablaCodigoFuente[0].tablaDistancias {
+		nombre = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
+		fmt.Fprintf ( ptrArchivo, "\t%s", nombre )
+	}
+	fmt.Fprintf (ptrArchivo, "\n" )	
+
+	for _, archivo := range tablaCodigoFuente {
+		nombre = strings.Replace(archivo.nombre, directioActual, ".", 1)
+
+		fmt.Fprintf ( ptrArchivo, "%s\t", nombre )
+
+		for _, distanciaArchivo := range archivo.tablaDistancias {
+				fmt.Fprintf(ptrArchivo, "\t%8.2f", distanciaArchivo.distancia )
+		}
+		fmt.Fprintf (ptrArchivo, "\n" )			
 	}
 }
 
@@ -217,12 +254,14 @@ func main() {
 	fmt.Println("SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)")
 	fmt.Println("Julián Esteban Gutiérrez Posada")
 	fmt.Println("jugutier@uniquindio.edu.co\n")
-	fmt.Println("Versión 1.1 - Licencia GNU - GPL v3")
-	fmt.Println("Noviembre de 2020\n")
+	fmt.Println("Versión 1.5 - Licencia GNU - GPL v3")
+	fmt.Println("Agosto de 2021\n")
 
 	fmt.Println("Para más información user ./SASC --help\n")
 
-	extensionPorDefecto, distanciaMinima := obtenerValorPorDefecto()
+	extensionPorDefecto, distanciaMinima, nombreTablaCSV := obtenerValorPorDefecto()
+
+	//nombreTablaCSV = "salida.csv"
 
 	directorioActual, _ := os.Getwd()
 
@@ -240,6 +279,12 @@ func main() {
 	fmt.Println("Fase 2 de 3: Calculando distancia entre los archivos...")
 	tablaCodigoFuente = determinarDistanciasEntreArchivos(tablaCodigoFuente)
 
-	fmt.Println("Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...")
-	imprimirDistancias(tablaCodigoFuente, distanciaMinima, directorioActual)
+	if nombreTablaCSV == "" {
+		fmt.Println("Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...")
+		imprimirDistancias(tablaCodigoFuente, distanciaMinima, directorioActual)
+	} else {
+		fmt.Println("Fase 3 de 3: Generando el archivo \""+nombreTablaCSV+"\"")
+		generarArchivoCSV(tablaCodigoFuente, directorioActual, nombreTablaCSV)
+	}
+
 }
