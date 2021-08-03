@@ -125,8 +125,12 @@ En este ejemplo hipotético, sería interesante dar una mirada con detenimiento 
 
 2) Ubicado en el directorio "/Trabajo" se ejecuta el comando:
 
-```./SASC go Reporte.csv
 
+`./SASC go Reporte.csv`
+
+Obteniendo la siguiente salida:
+
+```
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
