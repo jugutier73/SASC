@@ -81,7 +81,7 @@ Ubicado en el directorio "/Trabajo" se ejecuta el comando:
 
 Obteniendo la siguiente salida:
 
-`
+```
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
@@ -108,7 +108,7 @@ Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
 ./Grupo 03/sumarF.go
 	   83.42 ./Grupo 02/sumaTubos.go
 	   99.94 ./Grupo 01/sumaFlujos.go
-`
+```
 
 En este ejemplo hipotético, sería interesante dar una mirada con detenimiento a los archivos
 ./Grupo 01/sumaFlujos.go y ./Grupo 03/sumarF.go
@@ -116,7 +116,7 @@ En este ejemplo hipotético, sería interesante dar una mirada con detenimiento 
 
 2) Ubicado en el directorio "/Trabajo" se ejecuta el comando:
 
-`./SASC go Reporte.csv
+```./SASC go Reporte.csv
 
 Procesando 3 archivo de extensión .go en /Trabajo
 
@@ -130,7 +130,7 @@ CÓDIGO FUENTE       	./Grupo 01/sumaFlujos.go    ./Grupo 02/sumaTubos.go    ./G
 ./Grupo 01/sumaFlujos.go      	 0.00          	        75.28             	99.94
 ./Grupo 02/sumaTubos.go       	75.28           	 0.00             	83.42
 ./Grupo 03/sumarF.go          	99.94                 	83.42              	 0.00      
-`
+```
 
 
 Espero les sea de utilidad.
