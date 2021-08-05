@@ -1,4 +1,5 @@
-# SASC
+# SASC v1.8
+
 El sistema SASC permite determinar la distancia euclidiana entre TODOS los archivos indicados en un grupo de subdirectorios.
 
 Pregunta 
