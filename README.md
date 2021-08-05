@@ -62,7 +62,7 @@ Utilización
        ./SASC java
 
     b. Analiza en todos los subdirectorios del directorio actual por programas de extensión (.c) e 
-       imprimir solamente las distancia menores o iguales 30, recuerde que 0 es que ambos archivos usaron la misma cantidad todos los caracteres de la tabla ASCII
+       imprimir solamente las distancia menores o iguales 30, recuerde que 0 es que ambos archivos usaron la misma cantidad todos los caracteres de la tabla ASCII. Además busca agrupar los programas según las distancias. Esta agrupación no se imprime cuando no hay una distancia mínima.
 
        ./SASC c 30
        
@@ -106,6 +106,20 @@ Fase 1 de 3: Calculando características de cada archivo...
 Fase 2 de 3: Calculando distancia entre los archivos...
 Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...
 
+GRUPOS
+
+GRUPO 1
+   ./Grupo 01/sumaFlujos.go   
+   ./Grupo 02/sumaTubos.go
+   ./Grupo 03/sumarF.go
+
+GRUPO 2
+   ./Grupo 02/sumaTubos.go
+   ./Grupo 03/sumarF.go
+
+
+DISTANCIAS
+
 ./Grupo 01/sumaFlujos.go
 	   75.28 ./Grupo 02/sumaTubos.go
 	   99.94 ./Grupo 03/sumarF.go
@@ -125,12 +139,8 @@ En este ejemplo hipotético, sería interesante dar una mirada con detenimiento 
 
 2) Ubicado en el directorio "/Trabajo" se ejecuta el comando:
 
+```./SASC go Reporte.csv
 
-`./SASC go Reporte.csv`
-
-Obteniendo la siguiente salida:
-
-```
 SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)
 Julián Esteban Gutiérrez Posada
 jugutier@uniquindio.edu.co
@@ -157,5 +167,3 @@ CÓDIGO FUENTE       	./Grupo 01/sumaFlujos.go    ./Grupo 02/sumaTubos.go    ./G
 ```
 
 Espero les sea de utilidad.
-
-
