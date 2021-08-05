@@ -1,17 +1,23 @@
 /*
  * SASC (Sistema Automático de Similaridad de Código) analiza todos los archivos de una extensión
  * determinada (go por defecto o la que el usuario indique) desde el directorio de ejecución.
+ *
  * El análisis consiste en determinar por cada archivo la frecuencia de todos sus caracteres y
  * calcular la distancia euclidiana entre ellos usando dicha información.
- * Luego imprime un informe de la distancia de cada archivo a todos los demás.
- * El usuario puede restringir la impresión solamente a los que se encuentren a un distancia mímina.
  *
- * Ahora en la verisón 1.5 ya se puede generar un archivo para una hoja electróca,
- * una matriz para comparar todos los trabajos con una distancia máxima definida.
+ * Luego imprime dos informes:
+ * - Agrupación de trabajos (grupos) que se encuentran a una distancia mìnima definida por el usuario. 
+ *   Disponible desde la versión 1.8
+ * - Distancia de cada archivo a todos los demás (entre menor la distancia, mayor la similaridad, en donde 0.0 indica que son idénticos).
+ *
+ * El usuario puede:
+ * - Restringir la impresión solamente a los que se encuentren a un distancia mímina.
+ * - Puede solicitar la generación de un archivo CSV con la matriz (simétrica) de distancias entre los programas. 
+ *   Esta matriz puede ser visulizada en una hoja electrónica o procesada por algún programa especializado.
  *
  * Autor: Julián Esteban Gutiérrez Posada
  * Fecha: Agosto de 2021
- * Versión: 1.5
+ * Versión: 1.8
  * Licencia: GNU GPL v3 (https://www.gnu.org/licenses/gpl-3.0.html)
  */
 
@@ -164,14 +170,19 @@ func determinarCaracteristicas(listado []string) []CodigoFuente {
 
 /*
  * Función que determina las distancias entre todos los archivos de la tabla de código fuente
+ * Como la matriz de distancias es una matriz simétrica, se puede optimizar (futura versión)
+ * para hace el código más rápido al disminuir la cantidad de veces que se calcula la distancia.
+ * Algo similar a los que se hace en la función de los grupos.
  * param: arreglo la información de todos los archivos de código fuente
  * return: completa la información en el arreglo de código fuente con la distancia a todos los demás de forma ascendente
  */
 func determinarDistanciasEntreArchivos(tablaCodigoFuente []CodigoFuente) []CodigoFuente {
 
+	var distanciaTemp float64
+
 	for i, archivo1 := range tablaCodigoFuente {
 		for _, archivo2 := range tablaCodigoFuente {
-			distanciaTemp := calcularDistancia(archivo1, archivo2)
+			distanciaTemp = calcularDistancia(archivo1, archivo2)
 			tablaCodigoFuente[i].tablaDistancias = append(tablaCodigoFuente[i].tablaDistancias, DistanciaCodigo{nombre: archivo2.nombre, distancia: distanciaTemp})
 		}
 	}
@@ -180,12 +191,45 @@ func determinarDistanciasEntreArchivos(tablaCodigoFuente []CodigoFuente) []Codig
 }
 
 /*
+ * Función para imprimir los grupos de trabaja que se encuentran a una distancia mínima.
+ * Un programa puede estar en varios grupos, lo que significa que él está a una distancia mìnima de varios programas,
+ * pero esos otros programas no están a esa distancia mínima.
+ * param: arreglo con la información del código fuente de los archivo, la distancia mínina y directorio actual
+ */
+ func imprimitGrupos(tablaCodigoFuente []CodigoFuente, distanciaMinima float64, directioActual string) {
+	var nombre, integrantes string
+	var cantidadIntegrantes, cantidadGrupos int
+
+	fmt.Println("\nGRUPOS\n")
+
+	cantidadGrupos = 1
+	for i, archivo := range tablaCodigoFuente {
+		integrantes = "GRUPO " + strconv.Itoa(cantidadGrupos) +"\n"
+		cantidadIntegrantes = 0
+		for _, distanciaArchivo := range archivo.tablaDistancias[i:] { // Se procesa la mitad de la matriz (por encima de la diagonal principal)
+			if distanciaArchivo.distancia <= distanciaMinima {
+				nombre = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
+				integrantes += ( "\t" + nombre + "\n" )
+				cantidadIntegrantes++
+			}
+		}
+		if cantidadIntegrantes > 1 {
+			fmt.Println (integrantes)
+			cantidadGrupos++
+		}			
+	}
+	fmt.Println()
+}
+
+/*
  * Función para imprimir las distancias de cada archivo a todos los demás
  * usando el filtro de la distancia mínima
- * param: arreglo con la información del código fuente de los archivo y la distancia mínina
+ * param: arreglo con la información del código fuente de los archivo, la distancia mínina y directorio actual
  */
 func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float64, directioActual string) {
 	var nombre, nombre2 string
+
+	fmt.Println("\nDISTANCIAS\n")
 
 	for _, archivo := range tablaCodigoFuente {
 		// Ordena las distancias de forma ascendente
@@ -194,30 +238,25 @@ func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float6
 		})
 
 		nombre = strings.Replace(archivo.nombre, directioActual, ".", 1)
-		bandera := false
+		fmt.Println(nombre)
 
-		for _, distanciaArchivo := range archivo.tablaDistancias {
+		for _, distanciaArchivo := range archivo.tablaDistancias { // Se recorre toda la matriz para imprimir todas las distancias 
 			if distanciaArchivo.distancia <= distanciaMinima {
-				if bandera == false {
-					bandera = true
-					fmt.Println(nombre)
-				}
 				nombre2 = strings.Replace(distanciaArchivo.nombre, directioActual, ".", 1)
-				if nombre != nombre2 {
+				if archivo.nombre != distanciaArchivo.nombre {
 					fmt.Printf("\t%8.2f %s\n", distanciaArchivo.distancia, nombre2)
-				}
+				} 
 			}
 		}
-		if bandera == true {
-			fmt.Println()			
-		}
+		fmt.Println()			
 	}
 }
 
+
+
 /*
- * Función para imprimir las distancias de cada archivo a todos los demás
- * usando el filtro de la distancia mínima
- * param: arreglo con la información del código fuente de los archivo y la distancia mínina
+ * Función para guarda en un archivo CSV las distancias de cada archivo a todos los demás
+ * param: arreglo con la información del código fuente de los archivo, directorio actual y nombre CSV
  */
  func generarArchivoCSV(tablaCodigoFuente []CodigoFuente, directioActual string, nombreTablaCSV string) {
 	var nombre string
@@ -235,7 +274,7 @@ func imprimirDistancias(tablaCodigoFuente []CodigoFuente, distanciaMinima float6
 	}
 	fmt.Fprintf (ptrArchivo, "\n" )	
 
-	for _, archivo := range tablaCodigoFuente {
+	for _, archivo := range tablaCodigoFuente { // Se genera toda la matriz simétrica, en lugar de generar únicamente la mitad de ella.
 		nombre = strings.Replace(archivo.nombre, directioActual, ".", 1)
 
 		fmt.Fprintf ( ptrArchivo, "%s\t", nombre )
@@ -254,7 +293,7 @@ func main() {
 	fmt.Println("SISTEMA AUTOMÁTICO DE SIMILARIDAD DE CÓDIGO (SASC)")
 	fmt.Println("Julián Esteban Gutiérrez Posada")
 	fmt.Println("jugutier@uniquindio.edu.co\n")
-	fmt.Println("Versión 1.5 - Licencia GNU - GPL v3")
+	fmt.Println("Versión 1.8 - Licencia GNU - GPL v3")
 	fmt.Println("Agosto de 2021\n")
 
 	fmt.Println("Para más información user ./SASC --help\n")
@@ -281,10 +320,13 @@ func main() {
 
 	if nombreTablaCSV == "" {
 		fmt.Println("Fase 3 de 3: Imprimiendo distancia entre archivos de forma creciente...")
+		if distanciaMinima < math.MaxFloat64 { 
+			imprimitGrupos(tablaCodigoFuente, distanciaMinima, directorioActual)
+		}
+
 		imprimirDistancias(tablaCodigoFuente, distanciaMinima, directorioActual)
 	} else {
 		fmt.Println("Fase 3 de 3: Generando el archivo \""+nombreTablaCSV+"\"")
 		generarArchivoCSV(tablaCodigoFuente, directorioActual, nombreTablaCSV)
 	}
-
 }

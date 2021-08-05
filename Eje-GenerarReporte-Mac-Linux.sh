@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./SASC-macOS go 30 >Reporte.txt
-./SASC-macOS go Reporte.csv
+./SASC-MacOS go 30 >Reporte.txt
+./SASC-MacOS go Reporte.csv
