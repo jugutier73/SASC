@@ -69,7 +69,7 @@ Recuerde que 0 es que ambos archivos usaron la misma cantidad todos los caracter
 
        ./SASC c 30
        
-    c. Analiza, en todos los subdirectorios y en el directorio actual, todos los programas de extensión (.go) e imprime y crea un archivo llamado reporte.csv con una tabla con las distancias en formato CSV.
+   c. Analiza, en todos los subdirectorios y en el directorio actual, todos los programas de extensión (.go) e imprime y crea un archivo llamado reporte.csv con una tabla con las distancias en formato CSV.
 
        ./SASC go repore.csv
 
