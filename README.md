@@ -187,8 +187,8 @@ Para más información user ./SASC --help
 Procesando 8 archivo de extensión .go en /Users/jugutier/SASC/SASC-src 
 
 Fase 1 de 3: Calculando características de cada archivo...
-Fase 2 de 3: Calculando distancia entre los archivos...```
-
+Fase 2 de 3: Calculando distancia entre los archivos...
+```
 -> Reporte.csv <-
 
 ```
